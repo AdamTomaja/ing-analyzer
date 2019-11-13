@@ -1,32 +1,29 @@
-package com.cydercode.ing.analyzer;
+package com.cydercode.ing.analyzer.transactions;
 
-import com.cydercode.ing.analyzer.marking.Marker;
 import com.cydercode.ing.client.EasyIng;
 import com.cydercode.ing.client.accounts.AccountsResponseData;
 import com.cydercode.ing.client.common.IngException;
 import com.cydercode.ing.client.history.HistoryResponseData;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-public class MainController {
+public class TransactionsController {
 
-    private final Database database;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
     private final EasyIng easyIng;
 
-    public MainController(Database database, EasyIng easyIng) {
-        this.database = database;
+    public TransactionsController(EasyIng easyIng) {
         this.easyIng = easyIng;
-    }
-
-    @GetMapping("/")
-    public String hello() {
-        return "Hello World!";
     }
 
     @GetMapping("/today")
@@ -46,17 +43,12 @@ public class MainController {
         return transactions;
     }
 
-    @PostMapping("/markers")
-    public Marker addMarker(@RequestBody Marker marker) {
-        return database.addMarker(marker);
-    }
-
-    @GetMapping("/markers")
-    public List<Marker> getMarkers() {
-        return database.getMarkers();
-    }
-
     private HistoryResponseData getTransactions(AccountsResponseData.Account account) throws IngException {
-        return easyIng.getTransactions(Collections.singletonList(account.getAcct()), "", "2019-11-13", "2019-11-13", 1000);
+        String today = getTodayDate();
+        return easyIng.getTransactions(Collections.singletonList(account.getAcct()), "", today, today, 1000);
+    }
+
+    private String getTodayDate() {
+        return LocalDate.now().format(formatter);
     }
 }
