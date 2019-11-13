@@ -1,4 +1,4 @@
-package com.cydercode.ing.analyzer.marking;
+package com.cydercode.ing.analyzer.markers;
 
 import lombok.Data;
 

@@ -18,15 +18,17 @@ import java.util.stream.Collectors;
 @RestController
 public class TransactionsController {
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final EasyIng easyIng;
+    private final TransactionsRepository transactionsRepository;
 
-    public TransactionsController(EasyIng easyIng) {
+    public TransactionsController(EasyIng easyIng, TransactionsRepository transactionsRepository) {
         this.easyIng = easyIng;
+        this.transactionsRepository = transactionsRepository;
     }
 
-    @GetMapping("/today")
+    @GetMapping("/new")
     public Map<String, List<HistoryResponseData.Transaction>> getTodayTransactions() throws IngException {
         Map<String, List<HistoryResponseData.Transaction>> transactions = new HashMap<>();
         easyIng.getAccounts().getAccts().getCur().getAccts().forEach(account -> {
@@ -34,12 +36,14 @@ public class TransactionsController {
                 HistoryResponseData transactionsResponse = getTransactions(account);
                 transactions.put(account.getAcct(), transactionsResponse.getTrns()
                         .stream().map(wr -> wr.getM())
+                        .filter(trn -> !transactionsRepository.isMarked(trn))
                         .collect(Collectors.toList()));
             } catch (IngException e) {
                 throw new RuntimeException(e);
             }
         });
 
+        transactions.forEach((acc, trns) -> transactionsRepository.saveAll(trns));
         return transactions;
     }
 

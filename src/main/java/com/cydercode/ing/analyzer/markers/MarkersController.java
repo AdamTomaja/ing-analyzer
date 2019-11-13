@@ -1,4 +1,4 @@
-package com.cydercode.ing.analyzer.marking;
+package com.cydercode.ing.analyzer.markers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

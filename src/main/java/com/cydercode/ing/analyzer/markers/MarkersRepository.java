@@ -1,14 +1,15 @@
-package com.cydercode.ing.analyzer.marking;
+package com.cydercode.ing.analyzer.markers;
 
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
-class MarkersRepository {
+public class MarkersRepository {
 
     private List<Marker> markers = new CopyOnWriteArrayList<>();
 
@@ -20,5 +21,9 @@ class MarkersRepository {
 
     public List<Marker> getMarkers() {
         return Collections.unmodifiableList(markers);
+    }
+
+    public Optional<Marker> findByName(String markerName) {
+        return markers.stream().filter(m -> m.getName().equals(markerName)).findFirst();
     }
 }
